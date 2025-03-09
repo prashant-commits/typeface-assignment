@@ -1,5 +1,5 @@
 import { useUsers } from "@/contexts/UsersContext";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib";
 import {
   useClick,
   useDismiss,
