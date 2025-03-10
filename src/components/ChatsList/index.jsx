@@ -43,7 +43,7 @@ const ChatsList = ({ className }) => {
             key={id}
             className={cn(
               "px-2 py-1.5 text-[13px] leading-6 text-gray-700 group hover:bg-blue-500 hover:text-white cursor-pointer transition-all duration-150 ease-out font-medium",
-              currentChat === id && "bg-blue-500 text-white [&_p]:text-white"
+              currentChat?.id === id && "bg-blue-500 text-white [&_p]:text-white"
             )}
             onClick={() => setCurrentChatById(id)}
           >
