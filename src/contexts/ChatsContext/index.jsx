@@ -21,7 +21,7 @@ const SAMPLE_CHATS = [
         id: 7,
         content: "HI Beshty",
         sender: {
-          id: 2,
+          id: 2002,
           name: "Beshty",
         },
         created_at: "2025-03-10T03:05:34.182Z",
@@ -30,7 +30,7 @@ const SAMPLE_CHATS = [
         id: 6,
         content: "Are you ready to set a new record",
         sender: {
-          id: 2,
+          id: 2002,
           name: "Beshty",
         },
         created_at: "2025-03-10T03:05:25.145Z",
@@ -39,7 +39,7 @@ const SAMPLE_CHATS = [
         id: 5,
         content: "Hi Default User",
         sender: {
-          id: 2,
+          id: 2002,
           name: "Beshty",
         },
         created_at: "2025-03-10T03:05:06.609Z",
@@ -66,7 +66,7 @@ const SAMPLE_CHATS = [
         id: 2,
         content: "Wassup",
         sender: {
-          id: 2,
+          id: 2002,
           name: "Beshty",
         },
         created_at: "2025-03-10T03:03:44.945Z",
