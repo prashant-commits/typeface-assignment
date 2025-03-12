@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useUsers } from "../UsersContext";
 
 const ChatsContext = createContext();
@@ -7,6 +7,7 @@ const SAMPLE_CHATS = [
   {
     id: 1,
     name: "Chat 1",
+    type: "room",
     messages: [
       {
         id: 8,
@@ -78,19 +79,39 @@ const SAMPLE_CHATS = [
           id: 7008,
           name: "John Doe",
         },
+        thread: {
+          chatId: 2,
+        },
         created_at: "2025-03-10T03:03:39.656Z",
       },
     ],
+  },
+  {
+    id: 2,
+    name: "Hello, how are you?",
+    type: "thread",
+    metadata: {
+      chatId: 1,
+      messageId: 1,
+    },
+    messages: [],
   },
 ];
 
 export const ChatsProvider = ({ children }) => {
   const { currentUser } = useUsers();
   const [chats, setChats] = useState(SAMPLE_CHATS);
-  const [currentChat, setCurrentChat] = useState(null);
+  const [currentChatId, setCurrentChatId] = useState(null);
+
+  const currentChat = useMemo(() => {
+    return chats.find((chat) => chat.id === currentChatId) ?? null;
+  }, [currentChatId, chats]);
 
   const createNewChat = (name) => {
-    setChats([...chats, { id: chats.length + 1, name, messages: [] }]);
+    setChats([
+      ...chats,
+      { id: chats.length + 1, name, messages: [], type: "room" },
+    ]);
   };
 
   const deleteChatById = (chatId) => {
@@ -109,8 +130,66 @@ export const ChatsProvider = ({ children }) => {
     setChats([...chats]);
   };
 
-  const setCurrentChatById = (chatId) => {
-    setCurrentChat(chats.find((chat) => chat.id === chatId));
+  const sendMessageAndCreateThread = (chatId, messageContent) => {
+    const chatIndex = chats.findIndex((chat) => chat.id === chatId);
+    if (chatIndex === -1) return;
+    const nChat = {
+      id: chats.length + 1,
+      name: messageContent,
+      type: "thread",
+      metadata: {
+        chatId,
+        messageId: chats[chatIndex].messages.length + 1,
+      },
+      messages: [],
+    };
+    const nMessage = {
+      id: chats[chatIndex].messages.length + 1,
+      content: messageContent,
+      sender: currentUser,
+      thread: {
+        chatId: nChat.id,
+      },
+      created_at: new Date(),
+    };
+    nChat.messages.push({
+      id: 1,
+      content: messageContent,
+      sender: currentUser,
+      created_at: new Date(),
+    });
+    chats[chatIndex].messages.splice(0, 0, nMessage);
+    setChats([...chats, nChat]);
+  };
+
+  const getNumberOfMessagesByChatId = (chatId) => {
+    return chats.find((_) => _.id === chatId)?.messages.length;
+  };
+
+  const deleteMessageByMessageIdAndChatId = (chatId, messageId) => {
+    // const chatIndex = chats.findIndex((_) => _.id === chatId);
+    // if (chatIndex === -1) return;
+
+    // const messageIndex = chats[chatIndex].messages.findIndex(
+    //   (_) => _.id === messageId
+    // );
+    // if (messageIndex === -1) return;
+
+    // const nMessages = chats[chatIndex].messages.filter(
+    //   (_) => _.id !== messageId
+    // );
+
+    setChats(
+      chats.map((chat) => {
+        // debugger
+        return chat.id === chatId
+          ? {
+              ...chat,
+              messages: chat.messages.filter((msg) => msg.id !== messageId),
+            }
+          : chat;
+      })
+    );
   };
 
   return (
@@ -121,7 +200,10 @@ export const ChatsProvider = ({ children }) => {
         createNewChat,
         sendMessageToChat,
         deleteChatById,
-        setCurrentChatById,
+        setCurrentChatById: setCurrentChatId,
+        sendMessageAndCreateThread,
+        getNumberOfMessagesByChatId,
+        deleteMessageByMessageIdAndChatId,
       }}
     >
       {children}
